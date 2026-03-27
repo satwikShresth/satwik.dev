@@ -10,6 +10,9 @@ import tailwindcss from "@tailwindcss/vite";
 const config = defineConfig({
 	plugins: [
 		devtools(),
+		tsconfigPaths({ projects: ["./tsconfig.json"] }),
+		tailwindcss(),
+		tanstackStart({}),
 		nitro({
 			preset: "node",
 			static: true,
@@ -25,9 +28,6 @@ const config = defineConfig({
 				retryDelay: 500,
 			},
 		}),
-		tsconfigPaths({ projects: ["./tsconfig.json"] }),
-		tailwindcss(),
-		tanstackStart({}),
 		viteReact({
 			babel: {
 				plugins: ["babel-plugin-react-compiler"],
