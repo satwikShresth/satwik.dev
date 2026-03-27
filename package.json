@@ -11,7 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "start": "bun run ./dist/server/server.js",
+    "start": "bun run ./.output/server/index.mjs",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check"
