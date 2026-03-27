@@ -1,192 +1,231 @@
-# satwik.dev
+Welcome to your new TanStack Start app! 
 
-Personal portfolio website built with SvelteKit, showcasing projects, experience, and technical writeups.
+# Getting Started
 
-## Features
+To run this application:
 
-- 🎨 Modern, responsive design with dark mode support
-- 📊 Interactive architecture diagrams using SvelteFlow
-- 📝 MDX-based writeups and blog posts
-- 🎥 Video content delivery via S3 presigned URLs
-- 🔍 Type-safe environment variable management
-- ⚡ Built with Svelte 5 and TypeScript
-
-## Tech Stack
-
-### Core
-- **SvelteKit** - Full-stack framework
-- **Svelte 5** - UI framework with runes
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Bun** - Runtime and package manager
-
-### Styling
-- **Tailwind CSS 4** - Utility-first CSS
-- **Lucide Svelte** - Icon library
-- **bits-ui** - Headless UI components
-
-### Features
-- **SvelteFlow** - Interactive graph/diagram library
-- **dagre** - Graph layout algorithm
-- **mdsvex** - Markdown/MDX preprocessing
-- **MinIO** - S3-compatible object storage client
-- **Zod** - Schema validation
-- **@t3-oss/env-core** - Type-safe environment variables
-
-## Prerequisites
-
-- **Bun** (recommended) or Node.js 18+
-- A S3-compatible object storage service (for video hosting)
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd Personal-Website
-```
-
-2. Install dependencies:
 ```bash
 bun install
-# or
-npm install
+bun --bun run dev
 ```
 
-3. Set up environment variables (see [Environment Variables](#environment-variables))
+# Building For Production
 
-4. Start the development server:
-```bash
-bun run dev
-# or
-npm run dev
-```
-
-## Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-# S3 Configuration (for video/media hosting)
-S3_ENDPOINT=https://your-s3-endpoint.com
-S3_BUCKET=your-bucket-name
-S3_ACCESSKEYID=your-access-key-id
-S3_SECRETKEY=your-secret-key
-
-# Clerk Authentication (optional, if using authentication)
-PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
-```
-
-### Required Variables
-- `S3_ENDPOINT` - S3-compatible endpoint URL
-- `S3_BUCKET` - Bucket name for storing media
-- `S3_ACCESSKEYID` - S3 access key ID
-- `S3_SECRETKEY` - S3 secret access key
-
-### Optional Variables
-- `PUBLIC_CLERK_PUBLISHABLE_KEY` - Clerk publishable key (if using authentication)
-
-## Development
-
-Start the development server:
+To build this application for production:
 
 ```bash
-bun run dev
-# or
-npm run dev
+bun --bun run build
 ```
 
-The site will be available at `http://localhost:5173`
+## Testing
 
-### Available Scripts
-
-- `dev` - Start development server
-- `build` - Build for production
-- `preview` - Preview production build
-- `check` - Run Svelte type checking
-- `check:watch` - Run Svelte type checking in watch mode
-- `lint` - Run ESLint
-
-## Building for Production
-
-Build the production version:
+This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
 
 ```bash
-bun run build
-# or
-npm run build
+bun --bun run test
 ```
 
-Preview the production build:
+## Styling
+
+This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+
+### Removing Tailwind CSS
+
+If you prefer not to use Tailwind CSS:
+
+1. Remove the demo pages in `src/routes/demo/`
+2. Replace the Tailwind import in `src/styles.css` with your own styles
+3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
+4. Uninstall the packages: `bun install @tailwindcss/vite tailwindcss -D`
+
+## Linting & Formatting
+
+This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
+
 
 ```bash
-bun run preview
-# or
-npm run preview
+bun --bun run lint
+bun --bun run format
+bun --bun run check
 ```
 
-## Project Structure
 
-```
-.
-├── src/
-│   ├── lib/
-│   │   ├── components/        # Reusable components
-│   │   │   ├── architecture/  # Architecture diagram components
-│   │   │   ├── projects/      # Project showcase components
-│   │   │   └── ui/            # UI component library
-│   │   ├── content/           # MDX content files
-│   │   │   └── writeups/      # Blog posts and writeups
-│   │   ├── api/               # Remote functions/API
-│   │   ├── env.ts             # Environment variable validation
-│   │   └── s3.service.ts      # S3 service for presigned URLs
-│   └── routes/                # SvelteKit routes
-│       ├── +page.svelte       # Home page
-│       └── writeups/          # Writeups pages
-├── static/                    # Static assets
-├── svelte.config.js           # SvelteKit configuration
-├── vite.config.ts             # Vite configuration
-└── package.json               # Dependencies and scripts
+## T3Env
+
+- You can use T3Env to add type safety to your environment variables.
+- Add Environment variables to the `src/env.mjs` file.
+- Use the environment variables in your code.
+
+### Usage
+
+```ts
+import { env } from "#/env";
+
+console.log(env.VITE_APP_TITLE);
 ```
 
-## Architecture Diagrams
 
-The site features interactive architecture diagrams built with SvelteFlow and dagre. Diagrams are defined in `src/lib/components/architecture/` and can be embedded in both Svelte components and MDX files.
 
-Example usage in MDX:
-```mdx
-import ArchitectureDiagram from '$lib/components/ArchitectureDiagramWrapper.svelte';
-import { nodes, edges } from '$lib/components/architecture/your-diagram';
 
-<ArchitectureDiagram 
-  nodes={nodes}
-  edges={edges}
-  direction="TB"
-  height={500}
-  padding={20}
-/>
+
+## Shadcn
+
+Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
+
+```bash
+pnpm dlx shadcn@latest add button
 ```
 
-## Content Management
 
-Writeups are stored as MDX files in `src/lib/content/writeups/`. Each writeup includes frontmatter with metadata:
 
-```mdx
----
-title: 'My Writeup Title'
-date: '2025-01-01'
-description: 'A brief description'
-estimatedReadTime: 5
-tags: ['tag1', 'tag2']
----
+## Routing
 
-# Content goes here
+This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
+
+### Adding A Route
+
+To add a new route to your application just add a new file in the `./src/routes` directory.
+
+TanStack will automatically generate the content of the route file for you.
+
+Now that you have two routes you can use a `Link` component to navigate between them.
+
+### Adding Links
+
+To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
+
+```tsx
+import { Link } from "@tanstack/react-router";
 ```
 
-## License
+Then anywhere in your JSX you can use it like so:
 
-Private project - All rights reserved
+```tsx
+<Link to="/about">About</Link>
+```
 
-## Contact
+This will create a link that will navigate to the `/about` route.
 
-For questions or inquiries, please visit the website or reach out through the provided contact methods.
+More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
+
+### Using A Layout
+
+In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
+
+Here is an example layout that includes a header:
+
+```tsx
+import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+
+export const Route = createRootRoute({
+  head: () => ({
+    meta: [
+      { charSet: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { title: 'My App' },
+    ],
+  }),
+  shellComponent: ({ children }) => (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <header>
+          <nav>
+            <Link to="/">Home</Link>
+            <Link to="/about">About</Link>
+          </nav>
+        </header>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  ),
+})
+```
+
+More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
+
+## Server Functions
+
+TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
+
+```tsx
+import { createServerFn } from '@tanstack/react-start'
+
+const getServerTime = createServerFn({
+  method: 'GET',
+}).handler(async () => {
+  return new Date().toISOString()
+})
+
+// Use in a component
+function MyComponent() {
+  const [time, setTime] = useState('')
+  
+  useEffect(() => {
+    getServerTime().then(setTime)
+  }, [])
+  
+  return <div>Server time: {time}</div>
+}
+```
+
+## API Routes
+
+You can create API routes by using the `server` property in your route definitions:
+
+```tsx
+import { createFileRoute } from '@tanstack/react-router'
+import { json } from '@tanstack/react-start'
+
+export const Route = createFileRoute('/api/hello')({
+  server: {
+    handlers: {
+      GET: () => json({ message: 'Hello, World!' }),
+    },
+  },
+})
+```
+
+## Data Fetching
+
+There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
+
+For example:
+
+```tsx
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/people')({
+  loader: async () => {
+    const response = await fetch('https://swapi.dev/api/people')
+    return response.json()
+  },
+  component: PeopleComponent,
+})
+
+function PeopleComponent() {
+  const data = Route.useLoaderData()
+  return (
+    <ul>
+      {data.results.map((person) => (
+        <li key={person.name}>{person.name}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
+
+# Demo files
+
+Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
+
+# Learn More
+
+You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+
+For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).

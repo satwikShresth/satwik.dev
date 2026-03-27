@@ -1,26 +1,13 @@
 node_modules
-
-# Output
-.output
-.vercel
-.netlify
-.wrangler
-/.svelte-kit
-/build
-/dist
-
-# OS
 .DS_Store
-Thumbs.db
-
-target
-
-# Env
+dist
+dist-ssr
+*.local
 .env
-.env.*
-!.env.example
-!.env.test
-
-# Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
+.nitro
+.tanstack
+.wrangler
+.output
+.vinxi
+__unconfig*
+todos.json
