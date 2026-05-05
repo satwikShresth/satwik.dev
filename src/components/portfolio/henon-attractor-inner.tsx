@@ -1,262 +1,336 @@
-import HenonRustWorker from "@/lib/workers/henon-rust.worker.ts?worker"
-import { useEffect, useRef } from "react"
+import type { LayoutLine, PreparedTextWithSegments } from "@chenglou/pretext";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+	createHenonBackgroundPrepared,
+	HENON_BG_LINE_HEIGHT_PX,
+	HENON_BG_PAD_X,
+	layoutHenonBackgroundLines,
+} from "@/lib/henon-background-text";
+import HenonRustWorker from "@/lib/workers/henon-rust.worker.ts?worker";
+
+function henonBackgroundLineKey(line: LayoutLine): string {
+	return `${line.start.segmentIndex}:${line.start.graphemeIndex}-${line.end.segmentIndex}:${line.end.graphemeIndex}`;
+}
 
 export function HenonAttractorInner() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const densityMapRef = useRef<Uint32Array | null>(null)
-  const maxDensityRef = useRef(1)
-  const imageDataRef = useRef<ImageData | null>(null)
-  const currentWidthRef = useRef(0)
-  const currentHeightRef = useRef(0)
-  const renderAnimationFrameRef = useRef<number | null>(null)
-  const workersRef = useRef<Worker[]>([])
-  const isDarkRef = useRef(false)
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const preparedTextRef = useRef<PreparedTextWithSegments | null>(null);
+	const [backgroundLines, setBackgroundLines] = useState<LayoutLine[]>([]);
 
-  useEffect(() => {
-    const canvas = canvasRef.current
-    const container = containerRef.current
-    if (!canvas || !container) return
+	const syncBackgroundLines = useCallback((widthPx: number) => {
+		if (widthPx <= 0) return;
+		if (!preparedTextRef.current) {
+			preparedTextRef.current = createHenonBackgroundPrepared();
+		}
+		setBackgroundLines(
+			layoutHenonBackgroundLines(preparedTextRef.current, widthPx),
+		);
+	}, []);
+	const densityMapRef = useRef<Uint32Array | null>(null);
+	const maxDensityRef = useRef(1);
+	const imageDataRef = useRef<ImageData | null>(null);
+	const currentWidthRef = useRef(0);
+	const currentHeightRef = useRef(0);
+	const renderAnimationFrameRef = useRef<number | null>(null);
+	const workersRef = useRef<Worker[]>([]);
+	const isDarkRef = useRef(false);
 
-    function updateDarkMode() {
-      isDarkRef.current = document.documentElement.classList.contains("dark")
-    }
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		const container = containerRef.current;
+		if (!canvas || !container) return;
 
-    function renderFromDensityMap(
-      ctx: CanvasRenderingContext2D,
-      width: number,
-      height: number,
-    ) {
-      const densityMap = densityMapRef.current
-      const imageData = imageDataRef.current
-      if (!densityMap || !imageData) return
+		function updateDarkMode() {
+			isDarkRef.current = document.documentElement.classList.contains("dark");
+		}
 
-      const data = imageData.data
-      const isDark = isDarkRef.current
-      const r = isDark ? 255 : 20
-      const g = isDark ? 255 : 20
-      const b = isDark ? 255 : 20
+		function renderFromDensityMap(
+			ctx: CanvasRenderingContext2D,
+			_width: number,
+			_height: number,
+		) {
+			const densityMap = densityMapRef.current;
+			const imageData = imageDataRef.current;
+			if (!densityMap || !imageData) return;
 
-      data.fill(0)
+			const data = imageData.data;
+			const isDark = isDarkRef.current;
+			const r = isDark ? 255 : 20;
+			const g = isDark ? 255 : 20;
+			const b = isDark ? 255 : 20;
 
-      for (let i = 0; i < densityMap.length; i++) {
-        const density = densityMap[i]
-        if (density > 0) {
-          const normalized = Math.min(density / maxDensityRef.current, 1.0)
-          const opacity = Math.floor(80 + normalized ** 0.35 * 175)
-          const idx = i * 4
-          data[idx] = r
-          data[idx + 1] = g
-          data[idx + 2] = b
-          data[idx + 3] = opacity
-        }
-      }
+			data.fill(0);
 
-      ctx.putImageData(imageData, 0, 0)
-    }
+			for (let i = 0; i < densityMap.length; i++) {
+				const density = densityMap[i];
+				if (density > 0) {
+					const normalized = Math.min(density / maxDensityRef.current, 1.0);
+					const opacity = Math.floor(80 + normalized ** 0.35 * 175);
+					const idx = i * 4;
+					data[idx] = r;
+					data[idx + 1] = g;
+					data[idx + 2] = b;
+					data[idx + 3] = opacity;
+				}
+			}
 
-    function scheduleRender(
-      ctx: CanvasRenderingContext2D,
-      width: number,
-      height: number,
-    ) {
-      if (renderAnimationFrameRef.current !== null) {
-        cancelAnimationFrame(renderAnimationFrameRef.current)
-      }
-      renderAnimationFrameRef.current = requestAnimationFrame(() => {
-        renderFromDensityMap(ctx, width, height)
-        renderAnimationFrameRef.current = null
-      })
-    }
+			ctx.putImageData(imageData, 0, 0);
+		}
 
-    function mergeDensityIntoMap(batchDensity: Uint32Array) {
-      const densityMap = densityMapRef.current
-      if (!densityMap) return
-      for (let i = 0; i < densityMap.length; i++) {
-        if (batchDensity[i] > 0) {
-          densityMap[i] = batchDensity[i]
-          if (batchDensity[i] > maxDensityRef.current) {
-            maxDensityRef.current = batchDensity[i]
-          }
-        }
-      }
-    }
+		function scheduleRender(
+			ctx: CanvasRenderingContext2D,
+			width: number,
+			height: number,
+		) {
+			if (renderAnimationFrameRef.current !== null) {
+				cancelAnimationFrame(renderAnimationFrameRef.current);
+			}
+			renderAnimationFrameRef.current = requestAnimationFrame(() => {
+				renderFromDensityMap(ctx, width, height);
+				renderAnimationFrameRef.current = null;
+			});
+		}
 
-    function startParallelGeneration() {
-      const c = canvasRef.current
-      const cont = containerRef.current
-      if (!c || !cont) return
+		function mergeDensityIntoMap(batchDensity: Uint32Array) {
+			const densityMap = densityMapRef.current;
+			if (!densityMap) return;
+			for (let i = 0; i < densityMap.length; i++) {
+				if (batchDensity[i] > 0) {
+					densityMap[i] = batchDensity[i];
+					if (batchDensity[i] > maxDensityRef.current) {
+						maxDensityRef.current = batchDensity[i];
+					}
+				}
+			}
+		}
 
-      const aboutSection = document.getElementById("about")
-      const experienceSection = document.getElementById("experience")
-      if (!aboutSection || !experienceSection) return
+		function startParallelGeneration() {
+			const c = canvasRef.current;
+			const cont = containerRef.current;
+			if (!c || !cont) return;
 
-      const aboutRect = aboutSection.getBoundingClientRect()
-      const experienceRect = experienceSection.getBoundingClientRect()
-      const parentRect = cont.parentElement?.getBoundingClientRect()
-      if (!parentRect) return
+			const aboutSection = document.getElementById("about");
+			const experienceSection = document.getElementById("experience");
+			if (!aboutSection || !experienceSection) return;
 
-      const top = Math.min(aboutRect.top, experienceRect.top)
-      const bottom = Math.max(aboutRect.bottom, experienceRect.bottom)
-      const left = Math.min(aboutRect.left, experienceRect.left)
-      const right = Math.max(aboutRect.right, experienceRect.right)
+			const aboutRect = aboutSection.getBoundingClientRect();
+			const experienceRect = experienceSection.getBoundingClientRect();
+			const parentRect = cont.parentElement?.getBoundingClientRect();
+			if (!parentRect) return;
 
-      const viewportHeight = window.innerHeight
-      const viewportWidth = window.innerWidth
+			const top = Math.min(aboutRect.top, experienceRect.top);
+			const bottom = Math.max(aboutRect.bottom, experienceRect.bottom);
+			const left = Math.min(aboutRect.left, experienceRect.left);
+			const right = Math.max(aboutRect.right, experienceRect.right);
 
-      const baseWidth = right - left
-      const baseHeight = bottom - top
+			const viewportHeight = window.innerHeight;
+			const viewportWidth = window.innerWidth;
 
-      const paddingX = Math.max(300, viewportWidth * 0.2)
-      const paddingTop = Math.max(300, viewportHeight * 0.15)
-      const paddingBottom = Math.max(800, viewportHeight * 0.5)
+			const baseWidth = right - left;
+			const baseHeight = bottom - top;
 
-      const width = Math.max(
-        viewportWidth,
-        Math.floor(baseWidth + paddingX * 2),
-      )
-      const height = Math.max(
-        viewportHeight * 2,
-        Math.floor(baseHeight + paddingTop + paddingBottom),
-      )
+			const paddingX = Math.max(300, viewportWidth * 0.2);
+			const paddingTop = Math.max(300, viewportHeight * 0.15);
+			const paddingBottom = Math.max(800, viewportHeight * 0.5);
 
-      const topOffset = top - parentRect.top - paddingTop
-      const leftOffset = left - parentRect.left - paddingX
+			const width = Math.max(
+				viewportWidth,
+				Math.floor(baseWidth + paddingX * 2),
+			);
+			const height = Math.max(
+				viewportHeight * 2,
+				Math.floor(baseHeight + paddingTop + paddingBottom),
+			);
 
-      if (baseWidth === 0 || baseHeight === 0) return
+			const topOffset = top - parentRect.top - paddingTop;
+			const leftOffset = left - parentRect.left - paddingX;
 
-      currentWidthRef.current = width
-      currentHeightRef.current = height
+			if (baseWidth === 0 || baseHeight === 0) return;
 
-      cont.style.top = `${topOffset}px`
-      cont.style.left = `${leftOffset}px`
-      cont.style.width = `${width}px`
-      cont.style.height = `${height}px`
-      cont.style.overflow = "visible"
-      cont.style.maxWidth = "none"
-      cont.style.maxHeight = "none"
+			currentWidthRef.current = width;
+			currentHeightRef.current = height;
 
-      c.width = width
-      c.height = height
+			cont.style.top = `${topOffset}px`;
+			cont.style.left = `${leftOffset}px`;
+			cont.style.width = `${width}px`;
+			cont.style.height = `${height}px`;
+			cont.style.overflow = "visible";
+			cont.style.maxWidth = "none";
+			cont.style.maxHeight = "none";
 
-      const ctx = c.getContext("2d", { alpha: true })
-      if (!ctx) return
+			c.width = width;
+			c.height = height;
 
-      ctx.clearRect(0, 0, width, height)
+			syncBackgroundLines(width);
 
-      densityMapRef.current = new Uint32Array(width * height)
-      maxDensityRef.current = 1
-      imageDataRef.current = ctx.createImageData(width, height)
+			const ctx = c.getContext("2d", { alpha: true });
+			if (!ctx) return;
 
-      for (const w of workersRef.current) {
-        w.postMessage({ type: "stop" })
-        w.terminate()
-      }
-      workersRef.current = []
+			ctx.clearRect(0, 0, width, height);
 
-      const worker = new HenonRustWorker()
-      const seed = 1
+			densityMapRef.current = new Uint32Array(width * height);
+			maxDensityRef.current = 1;
+			imageDataRef.current = ctx.createImageData(width, height);
 
-      worker.onmessage = (e: MessageEvent) => {
-        const { type } = e.data as { type: string }
+			for (const w of workersRef.current) {
+				w.postMessage({ type: "stop" });
+				w.terminate();
+			}
+			workersRef.current = [];
 
-        if (type === "batch") {
-          const { density: batchDensity } = e.data as {
-            density: ArrayBuffer
-          }
-          if (batchDensity && densityMapRef.current) {
-            const arr = new Uint32Array(batchDensity)
-            mergeDensityIntoMap(arr)
-            if (ctx && imageDataRef.current) {
-              scheduleRender(ctx, width, height)
-            }
-          }
-        } else if (type === "complete") {
-          const { density: finalDensity, maxDensity: finalMax } = e.data as {
-            density: ArrayBuffer
-            maxDensity: number
-          }
-          if (finalDensity && densityMapRef.current) {
-            const finalDensityArray = new Uint32Array(finalDensity)
-            const dm = densityMapRef.current
-            for (let i = 0; i < dm.length; i++) {
-              dm[i] = finalDensityArray[i]
-            }
-            maxDensityRef.current = finalMax
-            if (ctx && imageDataRef.current) {
-              renderFromDensityMap(ctx, width, height)
-            }
-          }
-          workersRef.current = []
-        } else if (type === "error") {
-          console.error("Worker error:", (e.data as { error: string }).error)
-          workersRef.current = []
-        }
-      }
+			const worker = new HenonRustWorker();
+			const seed = 1;
 
-      worker.onerror = (error) => {
-        console.error("Worker error:", error)
-        workersRef.current = []
-      }
+			worker.onmessage = (e: MessageEvent) => {
+				const { type } = e.data as { type: string };
 
-      workersRef.current.push(worker)
+				if (type === "batch") {
+					const { density: batchDensity } = e.data as {
+						density: ArrayBuffer;
+					};
+					if (batchDensity && densityMapRef.current) {
+						const arr = new Uint32Array(batchDensity);
+						mergeDensityIntoMap(arr);
+						if (ctx && imageDataRef.current) {
+							scheduleRender(ctx, width, height);
+						}
+					}
+				} else if (type === "complete") {
+					const { density: finalDensity, maxDensity: finalMax } = e.data as {
+						density: ArrayBuffer;
+						maxDensity: number;
+					};
+					if (finalDensity && densityMapRef.current) {
+						const finalDensityArray = new Uint32Array(finalDensity);
+						const dm = densityMapRef.current;
+						for (let i = 0; i < dm.length; i++) {
+							dm[i] = finalDensityArray[i];
+						}
+						maxDensityRef.current = finalMax;
+						if (ctx && imageDataRef.current) {
+							renderFromDensityMap(ctx, width, height);
+						}
+					}
+					workersRef.current = [];
+				} else if (type === "error") {
+					console.error("Worker error:", (e.data as { error: string }).error);
+					workersRef.current = [];
+				}
+			};
 
-      worker.postMessage({
-        type: "start",
-        width,
-        height,
-        seed,
-        isDark: isDarkRef.current,
-      })
-    }
+			worker.onerror = (error) => {
+				console.error("Worker error:", error);
+				workersRef.current = [];
+			};
 
-    updateDarkMode()
+			workersRef.current.push(worker);
 
-    const observer = new MutationObserver(() => {
-      const wasDark = isDarkRef.current
-      updateDarkMode()
-      if (wasDark !== isDarkRef.current && canvasRef.current && containerRef.current) {
-        startParallelGeneration()
-      }
-    })
+			worker.postMessage({
+				type: "start",
+				width,
+				height,
+				seed,
+				isDark: isDarkRef.current,
+			});
+		}
 
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    })
+		updateDarkMode();
 
-    const t = window.setTimeout(() => {
-      startParallelGeneration()
-    }, 100)
+		const observer = new MutationObserver(() => {
+			const wasDark = isDarkRef.current;
+			updateDarkMode();
+			if (
+				wasDark !== isDarkRef.current &&
+				canvasRef.current &&
+				containerRef.current
+			) {
+				startParallelGeneration();
+			}
+		});
 
-    function handleResize() {
-      startParallelGeneration()
-    }
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
 
-    window.addEventListener("resize", handleResize)
+		const t = window.setTimeout(() => {
+			startParallelGeneration();
+		}, 100);
 
-    return () => {
-      window.clearTimeout(t)
-      observer.disconnect()
-      window.removeEventListener("resize", handleResize)
-      if (renderAnimationFrameRef.current !== null) {
-        cancelAnimationFrame(renderAnimationFrameRef.current)
-      }
-      for (const w of workersRef.current) {
-        w.postMessage({ type: "stop" })
-        w.terminate()
-      }
-      workersRef.current = []
-    }
-  }, [])
+		function handleResize() {
+			startParallelGeneration();
+		}
 
-  return (
-    <div ref={containerRef} className="absolute pointer-events-none z-0">
-      <canvas
-        ref={canvasRef}
-        className="block bg-transparent w-full h-full"
-        style={{ display: "block", background: "transparent", width: "100%", height: "100%" }}
-      />
-    </div>
-  )
+		window.addEventListener("resize", handleResize);
+
+		return () => {
+			window.clearTimeout(t);
+			observer.disconnect();
+			window.removeEventListener("resize", handleResize);
+			if (renderAnimationFrameRef.current !== null) {
+				cancelAnimationFrame(renderAnimationFrameRef.current);
+			}
+			for (const w of workersRef.current) {
+				w.postMessage({ type: "stop" });
+				w.terminate();
+			}
+			workersRef.current = [];
+		};
+	}, [syncBackgroundLines]);
+
+	useEffect(() => {
+		const el = containerRef.current;
+		if (!el) return;
+
+		let timeoutId = 0;
+		const observer = new ResizeObserver(() => {
+			window.clearTimeout(timeoutId);
+			timeoutId = window.setTimeout(() => {
+				const w = el.clientWidth;
+				if (w > 0) syncBackgroundLines(w);
+			}, 150);
+		});
+
+		observer.observe(el);
+		return () => {
+			window.clearTimeout(timeoutId);
+			observer.disconnect();
+		};
+	}, [syncBackgroundLines]);
+
+	return (
+		<div ref={containerRef} className="absolute pointer-events-none z-0">
+			<div
+				className="absolute inset-0 z-0 overflow-hidden text-muted-foreground/20 select-none dark:text-muted-foreground/15"
+				style={{
+					paddingLeft: HENON_BG_PAD_X,
+					paddingRight: HENON_BG_PAD_X,
+					fontFamily: '"Source Sans 3", sans-serif',
+					fontSize: 14,
+					fontWeight: 400,
+				}}
+				aria-hidden
+			>
+				{backgroundLines.map((line) => (
+					<div
+						key={henonBackgroundLineKey(line)}
+						style={{ lineHeight: `${HENON_BG_LINE_HEIGHT_PX}px` }}
+					>
+						{line.text}
+					</div>
+				))}
+			</div>
+			<canvas
+				ref={canvasRef}
+				className="relative z-10 block h-full w-full bg-transparent"
+				style={{
+					display: "block",
+					background: "transparent",
+					width: "100%",
+					height: "100%",
+				}}
+			/>
+		</div>
+	);
 }
