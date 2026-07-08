@@ -8,7 +8,7 @@ const experiences = [
     company: "Sharing Excess",
     location: "Philadelphia, PA",
     position: "Software Engineer",
-    period: "2024 – Present",
+    period: "July 2025 – Present",
     summary: [
       "React and TypeScript PWA for field logistics data. Migrated legacy JS to TypeScript and Express to oRPC.",
       "Playwright tests in CI. Database work for donation and redistribution workflows.",
