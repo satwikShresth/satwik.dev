@@ -1,5 +1,5 @@
 import path from "node:path"
-import { rm } from "node:fs/promises"
+import { mkdir, rm } from "node:fs/promises"
 import {
   type Activity,
   CorosApi,
@@ -167,7 +167,12 @@ function isInvalidTokenError(error: unknown) {
   return message.includes("1019") || message.includes("access token is invalid")
 }
 
+async function ensureCorosTokenDir() {
+  await mkdir(TOKEN_DIR, { recursive: true })
+}
+
 async function loginCorosClient(coros: CorosApi) {
+  await ensureCorosTokenDir()
   await coros.login()
   coros.exportTokenToFile(TOKEN_DIR)
 }
