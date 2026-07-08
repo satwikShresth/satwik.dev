@@ -19,7 +19,7 @@ export function ArchitectureDiagramLoader(props: InnerProps) {
   const h =
     typeof props.height === "number"
       ? props.height
-      : Number.parseInt(String(props.height), 10) || 500
+      : Number.parseInt(String(props.height), 10) || 260
 
   if (!Inner) {
     return (

@@ -2,18 +2,14 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import TanStackQueryProvider from "../integrations/tanstack-query/root-provider"
 
-import TanStackQueryDevtools from "../integrations/tanstack-query/devtools"
-
 import appCss from "../styles.css?url"
 
 import type { QueryClient } from "@tanstack/react-query"
-import { TanStackDevtools } from "@tanstack/react-devtools"
 import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
 } from "@tanstack/react-router"
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -42,15 +38,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       {
         rel: "stylesheet",
         href: appCss,
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.googleapis.com",
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
       },
       {
         rel: "apple-touch-icon",
@@ -83,25 +70,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme")||"dark";if(t==="system"){t=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"}document.documentElement.classList.add(t)}catch(e){document.documentElement.classList.add("dark")}})();`,
+          }}
+        />
       </head>
       <body className="min-h-screen antialiased">
         <ThemeProvider>
           <TooltipProvider>
-            <TanStackQueryProvider>
-              {children}
-              <TanStackDevtools
-                config={{
-                  position: "bottom-right",
-                }}
-                plugins={[
-                  {
-                    name: "Tanstack Router",
-                    render: <TanStackRouterDevtoolsPanel />,
-                  },
-                  TanStackQueryDevtools,
-                ]}
-              />
-            </TanStackQueryProvider>
+            <TanStackQueryProvider>{children}</TanStackQueryProvider>
           </TooltipProvider>
         </ThemeProvider>
         <Scripts />

@@ -1,28 +1,30 @@
-import { Moon, Sun } from "lucide-react"
-
+import { useTheme } from "@/components/use-theme"
 import { Button } from "@/components/ui/button"
-import { useTheme } from "@/components/theme-provider"
+import { useEffect, useState } from "react"
 
 export function ModeToggle() {
   const { setTheme } = useTheme()
+  const [isDark, setIsDark] = useState(true)
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"))
+  }, [])
 
   function toggle() {
-    const isDark = document.documentElement.classList.contains("dark")
-    setTheme(isDark ? "light" : "dark")
+    const nextDark = !document.documentElement.classList.contains("dark")
+    setTheme(nextDark ? "dark" : "light")
+    setIsDark(nextDark)
   }
 
   return (
     <Button
       type="button"
       onClick={toggle}
-      variant="ghost"
-      size="icon-lg"
-      aria-label="Toggle theme"
-      className="group relative h-11 w-11 rounded-full transition-colors hover:bg-muted/80"
+      variant="outline"
+      size="sm"
+      className="ml-1 h-auto rounded-[2px] border-[var(--subtle)] bg-transparent px-3 py-1 font-mono-label text-[9px] tracking-[0.05em] text-muted-foreground hover:border-foreground hover:text-foreground"
     >
-      <Sun className="absolute h-5 w-5 scale-100 rotate-0 text-muted-foreground transition-all group-hover:text-foreground dark:scale-0 dark:-rotate-90" />
-      <Moon className="absolute h-5 w-5 scale-0 rotate-90 text-muted-foreground transition-all group-hover:text-foreground dark:scale-100 dark:rotate-0" />
-      <span className="sr-only">Toggle theme</span>
+      {isDark ? "☀ Light" : "◑ Dark"}
     </Button>
   )
 }

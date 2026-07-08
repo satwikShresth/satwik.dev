@@ -4,7 +4,6 @@ import {
   getBezierPath,
   type EdgeProps,
 } from "@xyflow/react"
-import { useEffect, useState } from "react"
 
 export function CustomEdge({
   id,
@@ -18,30 +17,6 @@ export function CustomEdge({
   markerEnd,
   label,
 }: EdgeProps) {
-  const [labelColor, setLabelColor] = useState("#000000")
-  const [backgroundColor, setBackgroundColor] = useState("#ffffff")
-
-  useEffect(() => {
-    const updateColors = () => {
-      const root = document.documentElement
-      const computedFg = getComputedStyle(root)
-        .getPropertyValue("--foreground")
-        .trim()
-      const computedBg = getComputedStyle(root)
-        .getPropertyValue("--background")
-        .trim()
-      setLabelColor(computedFg || "#000000")
-      setBackgroundColor(computedBg || "#ffffff")
-    }
-    updateColors()
-    const observer = new MutationObserver(updateColors)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    })
-    return () => observer.disconnect()
-  }, [])
-
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -66,8 +41,8 @@ export function CustomEdge({
               padding: "2px 4px",
               borderRadius: 3,
               pointerEvents: "all",
-              color: labelColor,
-              backgroundColor,
+              color: "var(--foreground)",
+              backgroundColor: "var(--background)",
             }}
           >
             {label}

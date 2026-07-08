@@ -4,12 +4,12 @@ import { z } from "zod";
 export const env = createEnv({
 	server: {
 		SERVER_URL: z.url().optional(),
+		COROS_EMAIL: z.string().min(1).optional(),
+		COROS_PASSWORD: z.string().min(1).optional(),
+		/** Hours before a visit may trigger a COROS refresh. Default: 24. */
+		HIKE_CACHE_TTL_HOURS: z.coerce.number().int().positive().default(24),
 	},
 
-	/**
-	 * The prefix that client-side variables must have. This is enforced both at
-	 * a type-level and at runtime.
-	 */
 	clientPrefix: "VITE_",
 
 	client: {
@@ -17,24 +17,14 @@ export const env = createEnv({
 		VITE_PUBLIC_S3_INSP_VIDEO: z.url().optional(),
 	},
 
-	/**
-	 * What object holds the environment variables at runtime. This is usually
-	 * `process.env` or `import.meta.env`.
-	 */
-	runtimeEnv: import.meta.env,
-
-	/**
-	 * By default, this library will feed the environment variables directly to
-	 * the Zod validator.
-	 *
-	 * This means that if you have an empty string for a value that is supposed
-	 * to be a number (e.g. `PORT=` in a ".env" file), Zod will incorrectly flag
-	 * it as a type mismatch violation. Additionally, if you have an empty string
-	 * for a value that is supposed to be a string with a default value (e.g.
-	 * `DOMAIN=` in an ".env" file), the default value will never be applied.
-	 *
-	 * In order to solve these issues, we recommend that all new projects
-	 * explicitly specify this option as true.
-	 */
+	runtimeEnv: {
+		SERVER_URL: process.env.SERVER_URL,
+		COROS_EMAIL: process.env.COROS_EMAIL,
+		COROS_PASSWORD: process.env.COROS_PASSWORD,
+		HIKE_CACHE_TTL_HOURS: process.env.HIKE_CACHE_TTL_HOURS,
+		VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
+		VITE_PUBLIC_S3_INSP_VIDEO: import.meta.env.VITE_PUBLIC_S3_INSP_VIDEO,
+	},
+	skipValidation: typeof window !== "undefined",
 	emptyStringAsUndefined: true,
 });
