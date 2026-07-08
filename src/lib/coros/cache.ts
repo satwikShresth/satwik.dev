@@ -12,7 +12,7 @@ import {
   normalizeActivityCache,
 } from "@/lib/hikes/normalize"
 
-const CACHE_PATH = path.join(process.cwd(), "data", "hikes.json")
+const CACHE_PATH = path.join(process.cwd(), "data", "activities.json")
 
 const EMPTY_CACHE: ActivityCache = {
   cacheVersion: ACTIVITY_CACHE_VERSION,
@@ -25,7 +25,7 @@ const EMPTY_CACHE: ActivityCache = {
 let syncInFlight: Promise<ActivityCache> | null = null
 
 function cacheTtlMs() {
-  return env.HIKE_CACHE_TTL_HOURS * 60 * 60 * 1000
+  return env.ACTIVITY_CACHE_TTL_HOURS * 60 * 60 * 1000
 }
 
 function isFresh(syncedAt: string | null) {
@@ -43,14 +43,25 @@ async function parseCacheFile(): Promise<{
 }> {
   try {
     const raw = await readFile(CACHE_PATH, "utf8")
-    const parsed = JSON.parse(raw) as ActivityCache & { hikes?: OutdoorActivity[] }
+    const parsed = JSON.parse(raw) as ActivityCache
 
     return {
       legacy: isLegacyActivityCache(parsed),
       cache: normalizeActivityCache(parsed),
     }
   } catch {
-    return { legacy: false, cache: EMPTY_CACHE }
+    const legacyPath = path.join(process.cwd(), "data", "hikes.json")
+    try {
+      const raw = await readFile(legacyPath, "utf8")
+      const parsed = JSON.parse(raw) as ActivityCache
+
+      return {
+        legacy: true,
+        cache: normalizeActivityCache(parsed),
+      }
+    } catch {
+      return { legacy: false, cache: EMPTY_CACHE }
+    }
   }
 }
 
@@ -58,9 +69,6 @@ export async function readActivityCache(): Promise<ActivityCache> {
   const { cache } = await parseCacheFile()
   return cache
 }
-
-/** @deprecated */
-export const readHikeCache = readActivityCache
 
 export async function writeActivityCache(cache: ActivityCache) {
   await ensureCacheDir()
@@ -103,9 +111,6 @@ export async function syncActivityCache(force = false): Promise<ActivityCache> {
   return syncInFlight
 }
 
-/** @deprecated */
-export const syncHikeCache = syncActivityCache
-
 export async function getActivityLoaderData(): Promise<ActivityCache> {
   const { cache, legacy } = await parseCacheFile()
 
@@ -116,24 +121,4 @@ export async function getActivityLoaderData(): Promise<ActivityCache> {
   }
 
   return cache
-}
-
-export async function getOffTheClockActivities(): Promise<ActivityCache> {
-  if (!hasCorosCredentials()) {
-    console.warn("COROS_EMAIL and COROS_PASSWORD are not set — skipping sync")
-    return readActivityCache()
-  }
-
-  try {
-    return await syncActivityCache()
-  } catch (error) {
-    console.error("Failed to sync Coros activities:", error)
-    return readActivityCache()
-  }
-}
-
-/** @deprecated */
-export async function getHikeActivities(): Promise<OutdoorActivity[]> {
-  const cache = await getOffTheClockActivities()
-  return cache.hikes
 }

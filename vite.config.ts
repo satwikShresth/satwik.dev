@@ -8,7 +8,7 @@ const config = defineConfig({
 	resolve: { tsconfigPaths: true },
 	server: {
 		watch: {
-			ignored: ["**/data/**", "**/public/hikes/**"],
+			ignored: ["**/data/**"],
 		},
 	},
 	plugins: [

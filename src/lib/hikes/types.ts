@@ -18,7 +18,6 @@ export type OutdoorActivity = {
   maxHeartRate: number | null
   avgCadence: number | null
   calories: number | null
-  imagePath: string | null
   track: ActivityTrackPoint[]
 }
 
@@ -30,13 +29,4 @@ export type ActivityCache = {
   rides: OutdoorActivity[]
 }
 
-export const ACTIVITY_CACHE_VERSION = 4
-
-/** @deprecated Use OutdoorActivity */
-export type Hike = OutdoorActivity
-
-/** @deprecated Use ActivityTrackPoint */
-export type HikeTrackPoint = ActivityTrackPoint
-
-/** @deprecated Use ActivityCache */
-export type HikeCache = ActivityCache
+export const ACTIVITY_CACHE_VERSION = 6

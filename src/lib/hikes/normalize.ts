@@ -44,7 +44,6 @@ export function normalizeActivity(raw: LegacyActivity): OutdoorActivity {
     maxHeartRate: raw.maxHeartRate ?? null,
     avgCadence: raw.avgCadence ?? null,
     calories: normalizeCalories(raw.calories ?? null),
-    imagePath: raw.imagePath ?? null,
     track: Array.isArray(raw.track)
       ? raw.track.map((point) => normalizeTrackPoint(point))
       : [],
@@ -86,10 +85,10 @@ export function isLegacyActivityCache(raw: {
   return all.some((activity) => {
     if (
       !Array.isArray(activity.track) ||
-      !("imagePath" in activity) ||
       !("kind" in activity) ||
       !("avgHeartRate" in activity) ||
-      !("pauseTimeMinutes" in activity)
+      !("pauseTimeMinutes" in activity) ||
+      "imagePath" in activity
     ) {
       return true
     }
@@ -103,10 +102,3 @@ export function isLegacyActivityCache(raw: {
     )
   })
 }
-
-/** @deprecated */
-export const normalizeHike = normalizeActivity
-/** @deprecated */
-export const normalizeHikes = normalizeActivities
-/** @deprecated */
-export const isLegacyHikeCache = isLegacyActivityCache

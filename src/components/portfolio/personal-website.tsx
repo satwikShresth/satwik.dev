@@ -1,13 +1,6 @@
 import { ProjectSection } from "./project-section"
 
-const techStack = [
-  "Chakra UI",
-  "GitHub Actions",
-  "Next.js",
-  "React",
-  "TanStack Query",
-  "TypeScript",
-]
+const techStack = ["React", "Tailwind", "TanStack Start", "TypeScript"]
 
 export function PersonalWebsiteSection({
   id = "personal-website",
@@ -29,10 +22,7 @@ export function PersonalWebsiteSection({
       techStack={techStack}
       bordered={false}
     >
-      <ul className="space-y-1">
-        <li>Client-side blog with full-text and tag search</li>
-        <li>Older personal site — mostly essays and notes</li>
-      </ul>
+      <p>New personal site built with TanStack Start.</p>
     </ProjectSection>
   )
 }

@@ -5,7 +5,7 @@ import {
   activitySummaryLine,
   formatDate,
 } from "@/lib/hikes/format"
-import { HikeMap } from "@/components/portfolio/hike-map"
+import { ActivityTrackMap } from "@/components/portfolio/activity-track-map"
 import { cn } from "@/lib/utils"
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -36,12 +36,9 @@ function ActivityHoverCard({
   position: CardPosition
   cardRef: React.RefObject<HTMLDivElement | null>
 }) {
-  const [imageFailed, setImageFailed] = useState(false)
   const track = activity.track ?? []
   const hasTrack = track.length >= 2
   const stats = activityStats(activity)
-  const showImage = activity.imagePath && !imageFailed
-  const showVisual = showImage || hasTrack
 
   return (
     <div
@@ -54,19 +51,9 @@ function ActivityHoverCard({
       }}
       role="tooltip"
     >
-      {showVisual ? (
+      {hasTrack ? (
         <div className="relative aspect-[16/9] bg-[var(--surf)]">
-          {showImage ? (
-            <img
-              src={activity.imagePath!}
-              alt=""
-              className="h-full w-full object-cover"
-              loading="lazy"
-              onError={() => setImageFailed(true)}
-            />
-          ) : (
-            <HikeMap track={track} className="absolute inset-0" />
-          )}
+          <ActivityTrackMap track={track} />
         </div>
       ) : null}
 
@@ -186,6 +173,3 @@ export function ActivityRow({ activity }: { activity: OutdoorActivity }) {
     </div>
   )
 }
-
-/** @deprecated Use ActivityRow */
-export const ActivityCard = ActivityRow

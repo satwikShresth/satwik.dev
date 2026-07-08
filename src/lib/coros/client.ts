@@ -6,7 +6,6 @@ import {
   isDirectory,
 } from "@nyt87/crs-connect"
 import { env } from "@/env"
-import { saveHikeImage } from "@/lib/coros/images"
 import {
   corosMovingSeconds,
   corosTimeToMinutes,
@@ -101,7 +100,6 @@ async function mapActivity(
 ): Promise<OutdoorActivity> {
   let elevationFeet = 0
   let track: ActivityTrackPoint[] = []
-  let imagePath: string | null = null
   let avgHeartRate: number | null = null
   let maxHeartRate: number | null = null
   let avgCadence: number | null = null
@@ -141,10 +139,6 @@ async function mapActivity(
     // keep list-level fields when detail fetch fails
   }
 
-  if (activity.imageUrl) {
-    imagePath = await saveHikeImage(activity.labelId, activity.imageUrl)
-  }
-
   return {
     id: activity.labelId,
     name: activity.name,
@@ -158,7 +152,6 @@ async function mapActivity(
     maxHeartRate,
     avgCadence,
     calories,
-    imagePath,
     track,
   }
 }
@@ -254,12 +247,6 @@ export async function fetchActivitiesFromCoros(): Promise<CorosActivities> {
   }
 
   return withCorosClient(fetchActivityPages)
-}
-
-/** @deprecated */
-export async function fetchHikesFromCoros(): Promise<OutdoorActivity[]> {
-  const { hikes } = await fetchActivitiesFromCoros()
-  return hikes
 }
 
 export { hasCredentials as hasCorosCredentials }

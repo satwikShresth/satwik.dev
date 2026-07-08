@@ -271,6 +271,19 @@
     border-radius: 12px;
   }
 
+  .activity-track-map .leaflet-control-attribution {
+    font-size: 8px;
+    line-height: 1.2;
+    margin: 0;
+    opacity: 0.65;
+    padding: 2px 4px;
+    background: transparent;
+  }
+
+  .activity-track-map .leaflet-control-attribution a {
+    color: inherit;
+  }
+
   .nav-item {
     @apply tracking-[0.1em] text-foreground uppercase opacity-60 transition-opacity;
     font-family: var(--font-mono);

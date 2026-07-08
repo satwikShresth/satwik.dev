@@ -7,7 +7,7 @@ import { Projects } from "@/components/portfolio/projects"
 import { SectionNav } from "@/components/portfolio/section-nav"
 import { usePortfolioHashScroll } from "@/components/use-portfolio-hash"
 import { createFileRoute } from "@tanstack/react-router"
-import { getActivities } from "@/server/get-hikes"
+import { getActivities } from "@/server/get-activities"
 
 export const Route = createFileRoute("/")({
   loader: () => getActivities(),
