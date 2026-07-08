@@ -11,4 +11,9 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
-data/coros-token
+
+# Local sync cache and credentials
+data/
+
+# Scratch files from map/data experiments
+tmp-*.json
