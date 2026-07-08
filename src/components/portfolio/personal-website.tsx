@@ -30,14 +30,8 @@ export function PersonalWebsiteSection({
       bordered={false}
     >
       <ul className="space-y-1">
-        <li>
-          100% client-side playground for full-text and tag-searchable blog
-          posts
-        </li>
-        <li>
-          Born as therapy for runaway hot takes — no courses, no paywalls, just
-          unfiltered opinions and occasional flashes of genius
-        </li>
+        <li>Client-side blog with full-text and tag search</li>
+        <li>Older personal site — mostly essays and notes</li>
       </ul>
     </ProjectSection>
   )

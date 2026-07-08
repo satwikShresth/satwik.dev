@@ -24,6 +24,7 @@ export const PROJECT_ANCHOR_IDS = [
 export const OFF_THE_CLOCK_ANCHOR_IDS = [
   "offtheclock-hikes",
   "offtheclock-runs",
+  "offtheclock-rides",
 ] as const
 
 export function setPortfolioHash(id: string) {

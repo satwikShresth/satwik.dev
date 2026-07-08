@@ -19,6 +19,7 @@ const EMPTY_CACHE: ActivityCache = {
   syncedAt: null,
   hikes: [],
   runs: [],
+  rides: [],
 }
 
 let syncInFlight: Promise<ActivityCache> | null = null
@@ -71,12 +72,13 @@ async function refreshFromCoros(existing: ActivityCache): Promise<ActivityCache>
     return existing
   }
 
-  const { hikes, runs } = await fetchActivitiesFromCoros()
+  const { hikes, runs, rides } = await fetchActivitiesFromCoros()
   const cache: ActivityCache = {
     cacheVersion: ACTIVITY_CACHE_VERSION,
     syncedAt: new Date().toISOString(),
     hikes,
     runs,
+    rides,
   }
 
   await writeActivityCache(cache)

@@ -20,15 +20,18 @@ import type {
 
 const MAX_HIKES = 3
 const MAX_RUNS = 3
+const MAX_RIDES = 3
 const MAX_PAGES = 6
 const MAX_TRACK_POINTS = 80
 const HIKE_SPORT_TYPE = 104
 const RUN_SPORT_TYPES = new Set([100, 101, 102, 103])
+const RIDE_SPORT_TYPES = new Set([200, 299, 201, 202, 203, 204, 205])
 const TOKEN_DIR = path.join(process.cwd(), "data", "coros-token")
 
 export type CorosActivities = {
   hikes: OutdoorActivity[]
   runs: OutdoorActivity[]
+  rides: OutdoorActivity[]
 }
 
 function hasCredentials() {
@@ -51,6 +54,7 @@ function timestampToDate(timestamp: number) {
 function activityKind(sportType: number): ActivityKind | null {
   if (sportType === HIKE_SPORT_TYPE) return "hike"
   if (RUN_SPORT_TYPES.has(sportType)) return "run"
+  if (RIDE_SPORT_TYPES.has(sportType)) return "ride"
   return null
 }
 
@@ -213,10 +217,14 @@ async function withCorosClient<T>(
 async function fetchActivityPages(coros: CorosApi): Promise<CorosActivities> {
   const hikes: OutdoorActivity[] = []
   const runs: OutdoorActivity[] = []
+  const rides: OutdoorActivity[] = []
 
   for (
     let page = 1;
-    page <= MAX_PAGES && (hikes.length < MAX_HIKES || runs.length < MAX_RUNS);
+    page <= MAX_PAGES &&
+    (hikes.length < MAX_HIKES ||
+      runs.length < MAX_RUNS ||
+      rides.length < MAX_RIDES);
     page++
   ) {
     const result = await coros.getActivitiesList({ page, size: 30 })
@@ -228,19 +236,21 @@ async function fetchActivityPages(coros: CorosApi): Promise<CorosActivities> {
       if (!kind) continue
       if (kind === "hike" && hikes.length >= MAX_HIKES) continue
       if (kind === "run" && runs.length >= MAX_RUNS) continue
+      if (kind === "ride" && rides.length >= MAX_RIDES) continue
 
       const mapped = await mapActivity(coros, activity, kind)
       if (kind === "hike") hikes.push(mapped)
-      else runs.push(mapped)
+      else if (kind === "run") runs.push(mapped)
+      else rides.push(mapped)
     }
   }
 
-  return { hikes, runs }
+  return { hikes, runs, rides }
 }
 
 export async function fetchActivitiesFromCoros(): Promise<CorosActivities> {
   if (!hasCredentials()) {
-    return { hikes: [], runs: [] }
+    return { hikes: [], runs: [], rides: [] }
   }
 
   return withCorosClient(fetchActivityPages)

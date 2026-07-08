@@ -3,7 +3,7 @@ export function Footer() {
     <footer className="mt-auto border-t-[3px] border-foreground/90 bg-background">
       <div className="site-container-mobile flex flex-col items-start justify-between gap-3 py-3 sm:flex-row sm:items-center">
         <div className="font-mono-label text-[length:var(--type-nav)] text-muted-foreground">
-          © {new Date().getFullYear()} Satwik Shresth. All rights reserved.
+          © {new Date().getFullYear()} Satwik Shresth
         </div>
         <div className="flex flex-wrap items-center gap-4 sm:gap-5">
           <a

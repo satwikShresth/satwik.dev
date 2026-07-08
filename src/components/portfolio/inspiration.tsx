@@ -56,12 +56,10 @@ export function Inspiration({ id = "inspiration" }: { id?: string }) {
     >
       <ul className="space-y-1">
         <li>
-          FERPA-compliant open-source plagiarism detection for Drexel,
-          enabling self-hosted and privacy-focused implementation
+          Plagiarism detection tool for Drexel, built to run self-hosted
         </li>
         <li>
-          Multi-modal detection based on Stanford research with enhanced
-          visualization for software similarity analysis
+          Compares submissions across code, text, and other formats
         </li>
       </ul>
     </ProjectSection>

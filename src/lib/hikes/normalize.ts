@@ -22,7 +22,9 @@ function normalizeTrackPoint(point: { lat?: number; lng?: number }) {
 
 export function normalizeActivity(raw: LegacyActivity): OutdoorActivity {
   const kind: ActivityKind =
-    raw.kind === "run" || raw.kind === "hike" ? raw.kind : "hike"
+    raw.kind === "run" || raw.kind === "hike" || raw.kind === "ride"
+      ? raw.kind
+      : "hike"
 
   return {
     id: raw.id ?? "",
@@ -58,12 +60,14 @@ export function normalizeActivityCache(raw: {
   syncedAt?: string | null
   hikes?: LegacyActivity[]
   runs?: LegacyActivity[]
+  rides?: LegacyActivity[]
 }) {
   return {
     cacheVersion: raw.cacheVersion ?? 1,
     syncedAt: raw.syncedAt ?? null,
     hikes: normalizeActivities(raw.hikes ?? []),
     runs: normalizeActivities(raw.runs ?? []),
+    rides: normalizeActivities(raw.rides ?? []),
   }
 }
 
@@ -71,12 +75,13 @@ export function isLegacyActivityCache(raw: {
   cacheVersion?: number
   hikes?: LegacyActivity[]
   runs?: LegacyActivity[]
+  rides?: LegacyActivity[]
 }) {
   if ((raw.cacheVersion ?? 1) < ACTIVITY_CACHE_VERSION) {
     return true
   }
 
-  const all = [...(raw.hikes ?? []), ...(raw.runs ?? [])]
+  const all = [...(raw.hikes ?? []), ...(raw.runs ?? []), ...(raw.rides ?? [])]
 
   return all.some((activity) => {
     if (

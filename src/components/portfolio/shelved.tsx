@@ -19,12 +19,12 @@ export function Shelved({ id = "shelved" }: { id?: string }) {
     >
       <ul className="space-y-1">
         <li>
-          Group project mastering raw JavaScript — SSR, DOM manipulation, social
-          features including friends, following, and private collections
+          Group project in plain JavaScript — SSR, basic social features, private
+          collections
         </li>
         <li>
-          Strategy pattern across multiple content APIs. Built entirely on Deno
-          without bundling
+          Multiple content APIs behind a strategy pattern. Runs on Deno without a
+          bundler
         </li>
       </ul>
     </ProjectSection>

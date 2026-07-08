@@ -32,6 +32,13 @@ export function corosTimeToMinutes(value: number) {
 }
 
 const MAX_RUNNING_PACE_MIN_PER_MI = 45
+const MAX_RIDE_PACE_MIN_PER_MI = 60
+
+function maxPaceForKind(kind: OutdoorActivity["kind"]) {
+  if (kind === "hike") return 120
+  if (kind === "ride") return MAX_RIDE_PACE_MIN_PER_MI
+  return MAX_RUNNING_PACE_MIN_PER_MI
+}
 
 export function normalizeMovingTimeMinutes(
   minutes: number,
@@ -41,7 +48,7 @@ export function normalizeMovingTimeMinutes(
 ) {
   if (minutes < 1) return 0
 
-  const maxPace = kind === "hike" ? 120 : 45
+  const maxPace = maxPaceForKind(kind)
 
   if (minutes <= 5000 && distanceMiles >= 0.1) {
     const pace = minutes / distanceMiles
@@ -73,13 +80,15 @@ export function normalizeCalories(calories: number | null) {
 export function computePaceMinutesPerMile(
   distanceMiles: number,
   movingTimeMinutes: number,
+  kind: OutdoorActivity["kind"] = "run",
 ) {
   if (distanceMiles < 0.1 || movingTimeMinutes < 1) return null
 
   const pace = movingTimeMinutes / distanceMiles
+  const minPace = kind === "ride" ? 2 : 3.5
+  const maxPace = maxPaceForKind(kind)
 
-  // Running pace should land between ~4:00 and 40:00 /mi.
-  if (pace < 3.5 || pace > 45) return null
+  if (pace < minPace || pace > maxPace) return null
 
   return pace
 }
@@ -125,7 +134,10 @@ export function activitySummaryLine(activity: OutdoorActivity) {
   const duration = formatDuration(movingMinutes)
   if (duration) parts.push(duration)
 
-  if (activity.kind === "run" && activity.avgHeartRate) {
+  if (
+    (activity.kind === "run" || activity.kind === "ride") &&
+    activity.avgHeartRate
+  ) {
     parts.push(`${activity.avgHeartRate} bpm`)
   }
 
@@ -158,7 +170,7 @@ export function activityStats(activity: OutdoorActivity) {
     })
   }
 
-  if (activity.kind === "run") {
+  if (activity.kind === "run" || activity.kind === "ride") {
     if (activity.avgHeartRate) {
       stats.push({
         label: "Avg HR",
@@ -173,16 +185,24 @@ export function activityStats(activity: OutdoorActivity) {
       })
     }
 
-    if (activity.avgCadence) {
+    if (activity.kind === "run" && activity.avgCadence) {
       stats.push({
         label: "Cadence",
         value: `${activity.avgCadence} spm`,
       })
     }
 
+    if (activity.kind === "ride" && activity.avgCadence) {
+      stats.push({
+        label: "Cadence",
+        value: `${activity.avgCadence} rpm`,
+      })
+    }
+
     const pace = computePaceMinutesPerMile(
       activity.distanceMiles,
       movingMinutes,
+      activity.kind,
     )
     if (pace) {
       stats.push({

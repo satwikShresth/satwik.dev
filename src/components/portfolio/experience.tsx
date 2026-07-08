@@ -10,8 +10,8 @@ const experiences = [
     position: "Software Engineer",
     period: "2024 – Present",
     summary: [
-      "Logistics PWA with React & TypeScript for food distribution field data. Migrated legacy JS → TypeScript and Express → oRPC, reducing bugs and improving responsiveness by 30%.",
-      "Playwright E2E tests in CI/CD. Architected database schema for donation and redistribution workflows, optimizing queries by 20%.",
+      "React and TypeScript PWA for field logistics data. Migrated legacy JS to TypeScript and Express to oRPC.",
+      "Playwright tests in CI. Database work for donation and redistribution workflows.",
     ],
     technologies: [
       "React",
@@ -29,8 +29,8 @@ const experiences = [
     position: "Software Engineer Co-op",
     period: "Sep 2023 – Mar 2024",
     summary: [
-      "C++ protocol metrics publisher tailing multiple log files for 5.8B+ messages/day. Python orchestration layer with C++ bindings streaming real-time data on Grafana.",
-      "Concurrent Kafka consumer processing 500M+ messages in 5 minutes — 9× speed improvement.",
+      "C++ metrics publisher tailing log files for protocol monitoring. Python layer with C++ bindings feeding Grafana dashboards.",
+      "Kafka consumer for batch processing large message backlogs.",
     ],
     technologies: [
       "C++",
@@ -48,8 +48,8 @@ const experiences = [
     position: "Software Engineer Co-op",
     period: "Sep 2022 – Mar 2023",
     summary: [
-      "Async Windows IPC connecting multiple C++ applications with proprietary protocol, reducing alert latency by 60%.",
-      "Python/Doxygen tool integrating 15,000+ dynamic Windows help files into a C++ MFC application.",
+      "Windows IPC between C++ apps using an internal protocol.",
+      "Python tooling to integrate Windows help files into a C++ MFC app.",
     ],
     technologies: ["C++", "Python", "Windows IPC", "Doxygen", "Robotics"],
   },
@@ -60,7 +60,7 @@ const experiences = [
     position: "Teaching Assistant",
     period: "Sep 2022 – Mar 2025",
     summary: [
-      "Mentored 150+ students during weekly labs and tutoring hours. Built grading automation tool with Python & JavaScript — reduced grading time by 80%.",
+      "TA for weekly labs and office hours. Built a small grading script in Python and JavaScript.",
     ],
     technologies: ["Python", "JavaScript", "Mentoring"],
   },
@@ -70,7 +70,7 @@ export function Experience({ id = "experience" }: { id?: string }) {
   return (
     <section id={id} data-section={id} className="scroll-mt-24">
       <div className="section-label flex items-center gap-2">
-        <span>Work Experience</span>
+        <span>Experience</span>
         <HashLink id={id} label="Copy link to experience" />
       </div>
 

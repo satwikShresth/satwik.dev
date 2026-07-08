@@ -4,15 +4,17 @@ import { HashLink } from "@/components/portfolio/hash-link"
 
 const ACTIVITIES = [
   "Running",
-  "Bouldering V4–V5",
-  "Hiking NPS",
-  "Exploring parks",
+  "Riding",
+  "Bouldering",
+  "Hiking",
+  "Walking around",
 ] as const
 
 type OffTheClockProps = {
   id?: string
   hikes?: OutdoorActivity[]
   runs?: OutdoorActivity[]
+  rides?: OutdoorActivity[]
 }
 
 function ActivitySection({
@@ -45,8 +47,10 @@ export function OffTheClock({
   id = "offtheclock",
   hikes = [],
   runs = [],
+  rides = [],
 }: OffTheClockProps) {
-  const hasActivities = hikes.length > 0 || runs.length > 0
+  const hasActivities =
+    hikes.length > 0 || runs.length > 0 || rides.length > 0
 
   return (
     <section id={id} data-section={id} className="scroll-mt-24">
@@ -55,9 +59,6 @@ export function OffTheClock({
         <HashLink id={id} label="Copy link to off the clock" />
       </div>
       <div className="rounded-[3px] border border-[var(--brd)] bg-[var(--surf)] p-5 sm:p-6">
-        <h3 className="mb-4 font-serif-display text-[length:var(--type-heading)] text-foreground italic">
-          &ldquo;Always in motion&rdquo;
-        </h3>
         <div className="mb-4 flex flex-wrap gap-1.5">
           {ACTIVITIES.map((activity) => (
             <span key={activity} className="activity-pill">
@@ -77,6 +78,11 @@ export function OffTheClock({
               id="offtheclock-runs"
               title="Recent runs"
               activities={runs}
+            />
+            <ActivitySection
+              id="offtheclock-rides"
+              title="Recent rides"
+              activities={rides}
             />
           </div>
         ) : (

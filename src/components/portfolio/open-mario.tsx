@@ -38,22 +38,11 @@ export function OpenMario({ id = "openmario" }: { id?: string }) {
     >
       <ul className="space-y-1">
         <li>
-          Open-source platform for Drexel students to search job listings,
-          courses, and professor ratings in one place
+          Job listings, courses, and professor ratings for Drexel students
         </li>
         <li>
-          200+ weekly active users and 220+ wage submissions, without any
-          marketing, just word of mouth and a{" "}
-          <a
-            href="https://www.reddit.com/r/Drexel/comments/1jsa5tj/i_made_the_drexel_term_master_we_deserve/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary underline-offset-2 hover:underline"
-          >
-            Reddit post
-          </a>
+          Self-hosted on a VPS. Some regular users, mostly word of mouth
         </li>
-        <li>Self-hosted on personal VPS</li>
       </ul>
     </ProjectSection>
   )

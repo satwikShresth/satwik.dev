@@ -3,7 +3,7 @@ export type ActivityTrackPoint = {
   lng: number
 }
 
-export type ActivityKind = "hike" | "run"
+export type ActivityKind = "hike" | "run" | "ride"
 
 export type OutdoorActivity = {
   id: string
@@ -27,9 +27,10 @@ export type ActivityCache = {
   syncedAt: string | null
   hikes: OutdoorActivity[]
   runs: OutdoorActivity[]
+  rides: OutdoorActivity[]
 }
 
-export const ACTIVITY_CACHE_VERSION = 3
+export const ACTIVITY_CACHE_VERSION = 4
 
 /** @deprecated Use OutdoorActivity */
 export type Hike = OutdoorActivity

@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
 })
 
 function HomePage() {
-  const { hikes, runs } = Route.useLoaderData()
+  const { hikes, runs, rides } = Route.useLoaderData()
   usePortfolioHashScroll()
 
   return (
@@ -32,7 +32,7 @@ function HomePage() {
             <div className="py-10 lg:py-12 lg:pr-12">
               <Experience />
               <div className="mt-10">
-                <OffTheClock hikes={hikes} runs={runs} />
+                <OffTheClock hikes={hikes} runs={runs} rides={rides} />
               </div>
             </div>
 
