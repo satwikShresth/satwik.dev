@@ -36,10 +36,12 @@ function ActivityHoverCard({
   position: CardPosition
   cardRef: React.RefObject<HTMLDivElement | null>
 }) {
+  const [imageFailed, setImageFailed] = useState(false)
   const track = activity.track ?? []
   const hasTrack = track.length >= 2
   const stats = activityStats(activity)
-  const showVisual = activity.imagePath || hasTrack
+  const showImage = activity.imagePath && !imageFailed
+  const showVisual = showImage || hasTrack
 
   return (
     <div
@@ -54,12 +56,13 @@ function ActivityHoverCard({
     >
       {showVisual ? (
         <div className="relative aspect-[16/9] bg-[var(--surf)]">
-          {activity.imagePath ? (
+          {showImage ? (
             <img
-              src={activity.imagePath}
+              src={activity.imagePath!}
               alt=""
               className="h-full w-full object-cover"
               loading="lazy"
+              onError={() => setImageFailed(true)}
             />
           ) : (
             <HikeMap track={track} className="absolute inset-0" />

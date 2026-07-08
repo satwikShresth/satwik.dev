@@ -1,7 +1,8 @@
-import { mkdir, writeFile } from "node:fs/promises"
+import { mkdir, readFile, writeFile } from "node:fs/promises"
 import path from "node:path"
 
 const IMAGE_DIR = path.join(process.cwd(), "public", "hikes")
+const SAFE_FILENAME = /^[\w-]+\.(jpg|jpeg|png)$/i
 
 function resolveImageUrl(imageUrl: string) {
   if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
@@ -9,6 +10,21 @@ function resolveImageUrl(imageUrl: string) {
   }
 
   return `https://t.coros.com${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`
+}
+
+export async function readActivityImage(fileName: string) {
+  if (!SAFE_FILENAME.test(fileName)) return null
+
+  try {
+    const data = await readFile(path.join(IMAGE_DIR, fileName))
+    const contentType = fileName.toLowerCase().endsWith(".png")
+      ? "image/png"
+      : "image/jpeg"
+
+    return { data, contentType }
+  } catch {
+    return null
+  }
 }
 
 export async function saveHikeImage(
