@@ -28,18 +28,18 @@ function HomePage() {
 
       <main className="flex-1">
         <div className="site-container-mobile">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1px_1fr]">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1px_1fr] lg:items-start">
             <div className="py-10 lg:py-12 lg:pr-12">
               <Experience />
+              <div className="mt-10">
+                <OffTheClock hikes={hikes} runs={runs} />
+              </div>
             </div>
 
             <div className="hidden bg-[var(--brd)]/70 lg:block" aria-hidden />
 
             <div className="border-t border-[var(--brd)]/80 py-10 lg:border-t-0 lg:py-12 lg:pl-12">
               <Projects />
-              <div className="mt-10">
-                <OffTheClock hikes={hikes} runs={runs} />
-              </div>
             </div>
           </div>
         </div>
